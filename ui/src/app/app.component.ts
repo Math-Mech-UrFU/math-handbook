@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+// TODO: Make internalization
 @Component({
   selector: 'math-handbook-root',
   standalone: true,

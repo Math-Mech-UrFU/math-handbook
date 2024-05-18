@@ -2,15 +2,13 @@
     <nz-header></nz-header>
     <nz-layout>
         <nz-sider nzCollapsible (nzCollapsedChange)="isMenuCollapsed.set($event)">
-            <math-handbook-menu [isCollapsed]="isMenuCollapsed()"></math-handbook-menu>
+            <math-handbook-menu [isCollapsed]="isMenuCollapsed()" (selectFileChange)="showFile($event)"></math-handbook-menu>
         </nz-sider>
         <nz-layout class="content-layout">
-            <nz-breadcrumb class="breadcrumb">
-                <nz-breadcrumb-item>Home</nz-breadcrumb-item>
-                <nz-breadcrumb-item>List</nz-breadcrumb-item>
-                <nz-breadcrumb-item>App</nz-breadcrumb-item>
-            </nz-breadcrumb>
-            <nz-content class="content">Content</nz-content>
+            <math-handbook-breadcrumb class="breadcrumb"></math-handbook-breadcrumb>
+            <nz-content class="content">
+                <pdf-viewer class="pdf-viewer" [show-borders]="false" [render-text]="true" [original-size]="true" [fit-to-page]="true" [src]="file()"></pdf-viewer>
+            </nz-content>
         </nz-layout>
     </nz-layout>
 </nz-layout>
