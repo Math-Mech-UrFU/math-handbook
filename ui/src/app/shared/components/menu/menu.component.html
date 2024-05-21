@@ -1,28 +1,28 @@
 <ul nz-menu nzMode='inline' nzTheme='dark' [nzInlineCollapsed]='isCollapsed()'>
-    @for (item of treeStructure(); track item.path) {
+    @for (item of treeStructure(); track trackMenuItem(item)) {
         @switch (item.type) {
             @case ('blob') {
-                <li nz-menu-item (click)="selectFile(item)">
+                <li nz-menu-item [nzSelected]="item.isSelected" (click)="selectFile(item)" [routerLink]="['/home', item.fullPath]">
                     <span class='menu-item-icon' nz-icon nzType='file' nzTheme='outline'></span>
-                    <span>{{item.path}}</span>
+                    <span>{{item.name}}</span>
                 </li>
             }
             @case ('tree') {
-                <li nz-submenu nzIcon='folder' [nzTitle]='item.path'>
+                <li nz-submenu [nzOpen]="item.isSelected" nzIcon='folder' [nzTitle]='item.name' [routerLink]="['/home', item.fullPath]">
                     @if (item?.tree) {
                         <ul>
-                            @for (subItem of item.tree; track subItem.sha) {
+                            @for (subItem of item.tree; track subItem.sha || subItem.path) {
                                 @switch (subItem.type) {
                                     @case ('blob') {
-                                        <li nz-menu-item (click)="selectFile(subItem)">
+                                        <li nz-menu-item [nzSelected]="subItem.isSelected" (click)="selectFile(subItem)" (click)="$event.stopPropagation()" [routerLink]="['/home', subItem.fullPath]">
                                             <span class='menu-item-icon' nz-icon nzType='file' nzTheme='outline'></span>
-                                            <span>{{subItem.path}}</span>
+                                            <span>{{subItem.name}}</span>
                                         </li>
                                     }
                                     @case ('tree') {
-                                        <li nz-menu-item (click)='updateTreeStructure(subItem)'>
+                                        <li nz-menu-item (click)="$event.stopPropagation()" [nzSelected]="subItem.isSelected" [routerLink]="['/home', subItem.fullPath]">
                                             <span class='menu-item-icon' nz-icon nzType='folder' nzTheme='outline'></span>
-                                            <span>{{subItem.path}}</span>
+                                            <span>{{subItem.name}}</span>
                                         </li>
                                     }
                                 }
