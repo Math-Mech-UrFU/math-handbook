@@ -1,3 +1,12 @@
 <nz-breadcrumb>
-    <nz-breadcrumb-item>Home</nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+        <a routerLink="/home">Home</a>
+    </nz-breadcrumb-item>
+    @if (url()[0]) {
+        @for (item of url(); track item.sha || item.path) {
+            <nz-breadcrumb-item>
+                <a [routerLink]="['/home', item.fullPath]">{{item.name}}</a>
+            </nz-breadcrumb-item>
+        }
+    }
 </nz-breadcrumb>

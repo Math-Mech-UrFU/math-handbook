@@ -24,7 +24,9 @@
     "paths": {
       "@shared/*": ["./src/app/shared/*"],
       "@pages/*": ["./src/app/pages/*"],
-      "@models/*": ["./src/app/models/*"]
+      "@models/*": ["./src/app/models/*"],
+      "@store/*": ["./src/app/store/*"],
+      "@environments/*": ["./src/environments/*"]
 
     },
   },

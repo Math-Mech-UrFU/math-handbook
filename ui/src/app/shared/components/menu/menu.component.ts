@@ -1,48 +1,45 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from "@angular/core";
-import { MathHandbookHttpClient } from "@shared/services/http-client/http-client.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, input, output } from "@angular/core";
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { IGitHubFile, ITreeStructureItem, ITreeStructureRoot } from "@models/http-client/interfaces";
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { DEFAULT_TREE_URL_PATH, TREE_URL_LIST } from "@models/http-client/constants";
+import { RouterLink } from "@angular/router";
+import { ITreeStructureItem } from "@models/file-structure/interfaces";
+import { Store } from "@ngxs/store";
+import { FileStructureSelectors } from "@store/file-structure/file-structure.selectors";
+import { toSignal } from '@angular/core/rxjs-interop';
+import { switchMap } from "rxjs/operators";
+import { of } from "rxjs";
 
 @Component({
     selector: 'math-handbook-menu',
     standalone: true,
     templateUrl: 'menu.component.html',
     styleUrl: 'menu.component.scss',
-    imports: [NzToolTipModule, NzIconModule, NzMenuModule],
+    imports: [RouterLink, NzToolTipModule, NzIconModule, NzMenuModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent {
     isCollapsed = input(false);
 
-    selectFileChange = output<IGitHubFile>();
+    selectFileChange = output<ITreeStructureItem>();
 
-    treeStructure = signal<ITreeStructureRoot[]>([]);
+    treeStructure = toSignal(this.store.select(FileStructureSelectors.visibleFileStructure).pipe(
+        switchMap((fileStructure) => {
+            return of(Object.values(fileStructure));
+        }))
+    );
 
-    constructor(private readonly mathHandbookHttpClient: MathHandbookHttpClient) {}
+    constructor(private readonly store: Store, private readonly cdr: ChangeDetectorRef) {}
 
-    ngOnInit() {
-        this.updateTreeStructure();
+    // ngOnInit() {
+    //     this.treeStructure.
+    // }
+
+    trackMenuItem(item: ITreeStructureItem): string {
+        return `${item.sha || item.path}${item.isSelected}`
     }
 
-    async selectFile($event: ITreeStructureItem | ITreeStructureRoot) {
-        const file = await this.mathHandbookHttpClient.getFile($event.url);
-        this.selectFileChange.emit(file);
-    }
-
-    async updateTreeStructure(treeStructureItem?: ITreeStructureItem) {
-        if (!treeStructureItem) {
-            const treeStructure = await this.mathHandbookHttpClient.getTreeStructure(TREE_URL_LIST, 2);
-            this.treeStructure.set(Object.values(treeStructure));
-            return;
-        }
-        const treeStructure = await this.mathHandbookHttpClient.getTreeStructure([{
-            path: DEFAULT_TREE_URL_PATH,
-            type: treeStructureItem.type,
-            url: treeStructureItem.url
-        }], 2);
-        this.treeStructure.set(Object.values(treeStructure));
+    async selectFile($event: ITreeStructureItem) {
+        this.selectFileChange.emit($event);
     }
 }
